@@ -82,7 +82,7 @@ namespace EasyViewer.ViewModel
             var tableName = args.Grid.Tag.ToString();
             var columnName = args.Grid.CurrentCell.Column.Header.ToString();
             var columnIndex = args.Grid.CurrentCell.Column.DisplayIndex;
-            var dataRowView = args.Grid.SelectedItem as DataRowView;
+            var dataRowView = args.Grid.CurrentItem as DataRowView;
             if (dataRowView != null)
             {
                 var columnValue = dataRowView.Row.ItemArray[columnIndex];
