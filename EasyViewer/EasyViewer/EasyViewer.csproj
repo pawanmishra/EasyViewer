@@ -75,12 +75,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Design\DesignDataService.cs" />
+    <Compile Include="Dto\ContextMenuItemCommandArgs.cs" />
     <Compile Include="Dto\DataGridAutoGenerateCommandArgs.cs" />
     <Compile Include="Dto\DataGridDoubleClickCommandArgs.cs" />
     <Compile Include="Dto\ForeignKeyMetaData.cs" />
     <Compile Include="Dto\QueryData.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
+    <Compile Include="Model\IViewerService.cs" />
+    <Compile Include="Model\ViewerService.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">

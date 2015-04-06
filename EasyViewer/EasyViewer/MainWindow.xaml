@@ -60,7 +60,7 @@
                                     </Button>
                                 </DataTemplate>
                             </GroupBox.HeaderTemplate>
-                            <DataGrid ItemsSource="{Binding Path=QueryDataTable}" 
+                            <DataGrid ItemsSource="{Binding Path=QueryDataTable}"
                               HorizontalAlignment="Stretch"
                               AutoGenerateColumns="True" Width="auto" 
                               BorderThickness="1" Height="auto" IsReadOnly="True"
@@ -71,6 +71,11 @@
                               AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
                               MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
                               CanUserAddRows="False">
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Delete" Click="MenuItem_OnClick"></MenuItem>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
                             </DataGrid>
                         </GroupBox>
                     </DataTemplate>
