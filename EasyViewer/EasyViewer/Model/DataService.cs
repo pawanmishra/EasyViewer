@@ -40,7 +40,8 @@ namespace EasyViewer.Model
                 {
                     foreach (ForeignKeyColumn data in f.Columns)
                     {
-                        lst.Add(new ForeignKeyMetaData(data.Name, tb.Name, f.ReferencedTable, data.ReferencedColumn));
+                        lst.Add(new ForeignKeyMetaData(data.Name, tb.Name, tb.Schema, 
+                            f.ReferencedTable, data.ReferencedColumn, f.ReferencedTableSchema));
                     }
                 }
             }

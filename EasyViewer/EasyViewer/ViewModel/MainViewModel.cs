@@ -44,8 +44,8 @@ namespace EasyViewer.ViewModel
 
         public void ExecuteDbQuery()
         {
-            var data = _dataService.FetchQueryData("TimeTracker", "TimeTrackerHistory",
-                "select top(2) * from TimeTrackerHistory");
+            var data = _dataService.FetchQueryData("TSQL2012", "Orders",
+                "select top(2) * from sales.orders");
             data.Counter = Counter++;
             DataItems.Add(data);
         }
@@ -54,16 +54,16 @@ namespace EasyViewer.ViewModel
         {
             ForeignKeyMetaData data = null;
 
-            if (_metaData.ContainsKey("TimeTracker"))
+            if (_metaData.ContainsKey("TSQL2012"))
             {
-                var foreignKeyMetadata = _metaData["TimeTracker"];
+                var foreignKeyMetadata = _metaData["TSQL2012"];
                 data = foreignKeyMetadata.FirstOrDefault(x => x.CurrentColumn == 
                     e.ColumnEventArgs.PropertyName && x.CurrentTable.Equals(e.Grid.Tag.ToString()));
             }
             else
             {
-                var foreignKeyMetadata = _dataService.GetForeignKeyMetaData("TimeTracker");
-                _metaData.Add("TimeTracker", foreignKeyMetadata);
+                var foreignKeyMetadata = _dataService.GetForeignKeyMetaData("TSQL2012");
+                _metaData.Add("TSQL2012", foreignKeyMetadata);
                 data = foreignKeyMetadata.FirstOrDefault(x => x.CurrentColumn == e.ColumnEventArgs.PropertyName
                     && x.CurrentTable.Equals(e.Grid.Tag.ToString()));
             }
@@ -77,8 +77,8 @@ namespace EasyViewer.ViewModel
 
         public void DataGridDoubleClickHandler(DataGridDoubleClickCommandArgs args)
         {
-            string queryFmt = "select * from {0} where {1} = {2}";
-            var frameworkMetaData = _metaData["TimeTracker"];
+            string queryFmt = "select * from {0}.{1} where {2} = {3}";
+            var frameworkMetaData = _metaData["TSQL2012"];
             var tableName = args.Grid.Tag.ToString();
             var columnName = args.Grid.CurrentCell.Column.Header.ToString();
             var columnIndex = args.Grid.CurrentCell.Column.DisplayIndex;
@@ -92,8 +92,8 @@ namespace EasyViewer.ViewModel
 
                 if (data != null)
                 {
-                    var returnedData = _dataService.FetchQueryData("TimeTracker", data.ReferencedTable, 
-                        string.Format(queryFmt, data.ReferencedTable, data.ReferencedColumn, columnValue));
+                    var returnedData = _dataService.FetchQueryData("TSQL2012", data.ReferencedTable, 
+                        string.Format(queryFmt, data.ReferencedTableSchema, data.ReferencedTable, data.ReferencedColumn, columnValue));
                     returnedData.Counter = Counter++;
                     DataItems.Add(returnedData);
                 }
