@@ -37,6 +37,19 @@ namespace EasyViewer.ViewModel
             }
         }
 
+        private string _queryString;
+        public String QueryString
+        {
+            get { return _queryString; }
+            set
+            {
+                if (_queryString != value)
+                {
+                    _queryString = value;
+                }
+            }
+        }
+
         public MainViewModel(IDataService dataService)
         {
             _dataService = dataService;
@@ -85,7 +98,7 @@ namespace EasyViewer.ViewModel
 
         public void ExecuteDbQuery()
         {
-            var data = _dataService.FetchQueryData("", "");
+            var data = _dataService.FetchQueryData(ChosenDB, QueryString);
             DataItems.Add(data);
         }
 

@@ -53,7 +53,8 @@
             Name="textBox1"
             VerticalAlignment="Top" 
             Width="120"
-                Background="LightBlue"/>
+                Background="LightBlue"
+                Text="{Binding Path=QueryString}"/>
             
             <TextBlock Name="SizeTextBox" 
                  Height="23"
