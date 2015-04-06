@@ -22,16 +22,20 @@ namespace EasyViewer
 
         private void DbDataGrid_OnAutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs eventArgs)
         {
-            DataGrid grid = sender as DataGrid;
-            DataGridAutoGenerateCommandArgs commandArgs = new DataGridAutoGenerateCommandArgs(grid, eventArgs);
+            var grid = sender as DataGrid;
+            var commandArgs = new DataGridAutoGenerateCommandArgs(grid, eventArgs);
             var vm = ((MainViewModel)this.DataContext);
             if (vm.AutoGenerateColumn.CanExecute(commandArgs))
                 vm.AutoGenerateColumn.Execute(commandArgs);
         }
 
-        private void DbDataGrid_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void DbDataGrid_OnMouseDoubleClick(object sender, MouseButtonEventArgs eventArgs)
         {
-            throw new System.NotImplementedException();
+            var grid = sender as DataGrid;
+            var commandArgs = new DataGridDoubleClickCommandArgs(grid, eventArgs);
+            var vm = ((MainViewModel)this.DataContext);
+            if (vm.DoubleClickCommand.CanExecute(commandArgs))
+                vm.DoubleClickCommand.Execute(commandArgs);
         }
     }
 }

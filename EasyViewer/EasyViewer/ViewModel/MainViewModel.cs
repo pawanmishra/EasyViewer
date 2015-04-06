@@ -14,6 +14,7 @@ namespace EasyViewer.ViewModel
 
         public RelayCommand ExecuteQuery { get; private set; }
         public RelayCommand<DataGridAutoGenerateCommandArgs> AutoGenerateColumn { get; private set; }
+        public RelayCommand<DataGridDoubleClickCommandArgs> DoubleClickCommand { get; private set; } 
         public ObservableCollection<QueryData> DataItems { get; set; } 
 
         public MainViewModel(IDataService dataService)
@@ -21,6 +22,7 @@ namespace EasyViewer.ViewModel
             _dataService = dataService;
             ExecuteQuery = new RelayCommand(ExecuteDbQuery);
             AutoGenerateColumn = new RelayCommand<DataGridAutoGenerateCommandArgs>(AutoGenerateColumnHandler);
+            DoubleClickCommand = new RelayCommand<DataGridDoubleClickCommandArgs>(DataGridDoubleClickHandler);
             DataItems = new ObservableCollection<QueryData>();
         }
 
@@ -47,6 +49,11 @@ namespace EasyViewer.ViewModel
                 Style customStyle = (Style)e.Grid.FindResource("customStyle");
                 e.ColumnEventArgs.Column.CellStyle = customStyle;
             }
+        }
+
+        public void DataGridDoubleClickHandler(DataGridDoubleClickCommandArgs args)
+        {
+            
         }
     }
 }
