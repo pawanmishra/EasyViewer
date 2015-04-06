@@ -31,6 +31,13 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <DockPanel  Grid.Row="0">
+
+            <ComboBox
+	    HorizontalAlignment="Left"
+	    VerticalAlignment="Top"
+	    Width="120"
+        ItemsSource="{Binding Path=DataBases}"
+        />
             <Button Name="BtnRunBatch"
                     Margin="3" FontSize="18" FontWeight="Bold"
                     Foreground="Black" Background="LightGray"
