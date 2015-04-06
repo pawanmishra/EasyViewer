@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using EasyViewer.Model;
+using GalaSoft.MvvmLight.Command;
 
 namespace EasyViewer.ViewModel
 {
@@ -7,17 +8,12 @@ namespace EasyViewer.ViewModel
     {
         private readonly IDataService _dataService;
 
+        public RelayCommand ExecuteQuery { get; private set; }
+
         public MainViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            _dataService.GetData(
-                (item, error) =>
-                {
-                    if (error != null)
-                    {
-                        return;
-                    }
-                });
+            ExecuteQuery = new RelayCommand(ExecuteDbQuery);
         }
 
         ////public override void Cleanup()
@@ -26,5 +22,10 @@ namespace EasyViewer.ViewModel
 
         ////    base.Cleanup();
         ////}
+
+        public void ExecuteDbQuery()
+        {
+            
+        }
     }
 }
