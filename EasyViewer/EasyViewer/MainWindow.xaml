@@ -3,7 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.WPF45"
         xmlns:ignore="http://www.ignore.com"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d ignore"
         Height="300"
         Width="300"
@@ -15,6 +18,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="customStyle">
+                <Setter Property="TextBox.Background" Value="Yellow"></Setter>
+                <Setter Property="TextBox.IsReadOnly" Value="True"></Setter>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -33,7 +40,7 @@
                     Command="{Binding ExecuteQuery}">Execute</Button>
         </DockPanel>
         <StackPanel Grid.Row="1">
-            <!--<ItemsControl ItemsSource="{Binding DataSources}">
+            <ItemsControl ItemsSource="{Binding DataItems}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical"></StackPanel>
@@ -41,19 +48,21 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <DataGrid ItemsSource="{Binding Path=Table}" 
+                        <DataGrid ItemsSource="{Binding Path=QueryDataTable}" 
                           HorizontalAlignment="Stretch"
                           AutoGenerateColumns="True" Width="auto" 
                           BorderThickness="1" Height="auto"
                           ScrollViewer.CanContentScroll="True" 
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                          Name="SubmittedJobGrid" AutoGeneratingColumn="SubmittedJobGrid_OnAutoGeneratingColumn"
-                          LoadingRow="SubmittedJobGrid_OnLoadingRow" MouseDoubleClick="SubmittedJobGrid_OnMouseDoubleClick" 
-                          CanUserAddRows="False"/>
+                          Name="DbDataGrid"
+                          AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
+                          MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
+                          CanUserAddRows="False">
+                        </DataGrid>   
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
+            </ItemsControl>
         </StackPanel>
     </Grid>
 </Window>
