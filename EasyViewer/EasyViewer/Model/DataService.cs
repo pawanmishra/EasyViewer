@@ -12,7 +12,7 @@ namespace EasyViewer.Model
     {
         private readonly string _connectionStringFormat = ConfigurationManager.AppSettings["ConnectionStringFormat"];
 
-        public QueryData FetchQueryData(string dataBase, string query)
+        public QueryData FetchQueryData(string dataBase, string tableName, string query)
         {
             string connectionString = string.Format(_connectionStringFormat, dataBase);
 
@@ -20,9 +20,9 @@ namespace EasyViewer.Model
             {
                 conn.Open();
                 SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                DataSet dataset = new DataSet("TimeTracker");
+                DataSet dataset = new DataSet(tableName);
                 adapter.Fill(dataset);
-                return new QueryData(dataset.Tables[0], "TimeTrackerHistory");
+                return new QueryData(dataset.Tables[0], tableName);
             }
 
             return null;

@@ -8,8 +8,7 @@
         xmlns:ignore="http://www.ignore.com"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d ignore"
-        Height="300"
-        Width="300"
+        WindowState="Maximized"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     
@@ -40,7 +39,7 @@
                     Command="{Binding ExecuteQuery}">Execute</Button>
         </DockPanel>
         <StackPanel Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding DataItems}">
+            <ItemsControl x:Name="itemControl" ItemsSource="{Binding DataItems}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical"></StackPanel>
@@ -48,18 +47,32 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <DataGrid ItemsSource="{Binding Path=QueryDataTable}" 
-                          HorizontalAlignment="Stretch"
-                          AutoGenerateColumns="True" Width="auto" 
-                          BorderThickness="1" Height="auto"
-                          ScrollViewer.CanContentScroll="True" 
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                          Name="DbDataGrid" Tag="{Binding Path=TableName}"
-                          AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
-                          MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
-                          CanUserAddRows="False">
-                        </DataGrid>   
+                        <GroupBox Header="{Binding Path=TableName}">
+                            <GroupBox.HeaderTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding}" 
+                                            Margin="5"
+                                            ToolTip="Click to close the table!!"
+                                            Command="{Binding ElementName=itemControl, Path=DataContext.RemoveTableFromGridCommand}">
+                                        <Button.CommandParameter>
+                                            <Binding RelativeSource="{RelativeSource AncestorType={x:Type GroupBox}}" Path="DataContext.Counter" />
+                                        </Button.CommandParameter>
+                                    </Button>
+                                </DataTemplate>
+                            </GroupBox.HeaderTemplate>
+                            <DataGrid ItemsSource="{Binding Path=QueryDataTable}" 
+                              HorizontalAlignment="Stretch"
+                              AutoGenerateColumns="True" Width="auto" 
+                              BorderThickness="1" Height="auto" IsReadOnly="True"
+                              ScrollViewer.CanContentScroll="True" 
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              Name="DbDataGrid" Tag="{Binding Path=TableName}"
+                              AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
+                              MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
+                              CanUserAddRows="False">
+                            </DataGrid>
+                        </GroupBox>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
