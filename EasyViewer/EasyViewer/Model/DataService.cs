@@ -10,14 +10,16 @@ namespace EasyViewer.Model
 {
     public class DataService : IDataService
     {
-        public QueryData FetchQueryData()
+        private readonly string _connectionStringFormat = ConfigurationManager.AppSettings["ConnectionStringFormat"];
+
+        public QueryData FetchQueryData(string dataBase, string query)
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["TimeTracker"].ConnectionString;
+            string connectionString = string.Format(_connectionStringFormat, dataBase);
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                SqlDataAdapter adapter = new SqlDataAdapter(@"select top(2) * from TimeTrackerHistory", conn);
+                SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
                 DataSet dataset = new DataSet("TimeTracker");
                 adapter.Fill(dataset);
                 return new QueryData(dataset.Tables[0], "TimeTrackerHistory");
@@ -26,11 +28,11 @@ namespace EasyViewer.Model
             return null;
         }
 
-        public List<ForeignKeyMetaData> GetForeignKeyMetaData()
+        public List<ForeignKeyMetaData> GetForeignKeyMetaData(string dataBase)
         {
             List<ForeignKeyMetaData> lst = new List<ForeignKeyMetaData>();
             Server srv = new Server(".");
-            Database db = srv.Databases["TimeTracker"];
+            Database db = srv.Databases[dataBase];
 
             foreach (Table tb in db.Tables)
             {
@@ -38,7 +40,7 @@ namespace EasyViewer.Model
                 {
                     foreach (ForeignKeyColumn data in f.Columns)
                     {
-                        lst.Add(new ForeignKeyMetaData(data.Name, "TimeTrackerHistory", data.ReferencedColumn, f.ReferencedTable));
+                        lst.Add(new ForeignKeyMetaData(data.Name, tb.Name, data.ReferencedColumn, f.ReferencedTable));
                     }
                 }
             }

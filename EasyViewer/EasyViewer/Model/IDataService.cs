@@ -8,7 +8,7 @@ namespace EasyViewer.Model
 {
     public interface IDataService
     {
-        QueryData FetchQueryData();
-        List<ForeignKeyMetaData> GetForeignKeyMetaData();
+        QueryData FetchQueryData(string dataBase, string query);
+        List<ForeignKeyMetaData> GetForeignKeyMetaData(string dataBase);
     }
 }
