@@ -55,7 +55,7 @@
                           ScrollViewer.CanContentScroll="True" 
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                          Name="DbDataGrid"
+                          Name="DbDataGrid" Tag="{Binding Path=TableName}"
                           AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
                           MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
                           CanUserAddRows="False">
