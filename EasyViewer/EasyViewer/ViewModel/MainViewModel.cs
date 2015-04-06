@@ -37,27 +37,6 @@ namespace EasyViewer.ViewModel
             }
         }
 
-        private string _chosenTable;
-        public String ChosenTable
-        {
-            get { return _chosenTable; }
-            set
-            {
-                if (_chosenTable != value)
-                {
-                    _chosenTable = value;
-                  //  ABCO();
-                }
-            }
-            
-        }
-
-        private void ABCO()
-        {
-            throw new NotImplementedException();
-        }
-
-
         public MainViewModel(IDataService dataService)
         {
             _dataService = dataService;
