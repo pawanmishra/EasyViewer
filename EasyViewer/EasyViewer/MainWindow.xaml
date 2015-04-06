@@ -35,9 +35,34 @@
             <ComboBox
 	    HorizontalAlignment="Left"
 	    VerticalAlignment="Top"
-	    Width="120"
+	    Width="200"
         ItemsSource="{Binding Path=DataBases}"
+                SelectedItem="{Binding ChosenDB}"   
         />
+
+            <ComboBox
+	    HorizontalAlignment="Left"
+	    VerticalAlignment="Top"
+	    Width="200"
+                Name ="Qwe"
+        ItemsSource="{Binding Path=DataTables}"
+        />
+            <TextBox 
+            Height="23" 
+            HorizontalAlignment="Left" 
+            Name="textBox1"
+            VerticalAlignment="Top" 
+            Width="120"
+                Background="LightBlue"/>
+            
+            <TextBlock Name="SizeTextBox" 
+                 Height="23"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Top"
+                 Width="200"
+           Text="{Binding ElementName=Qwe, Path=Text}"
+                     Background="LightBlue" />
+            
             <Button Name="BtnRunBatch"
                     Margin="3" FontSize="18" FontWeight="Bold"
                     Foreground="Black" Background="LightGray"

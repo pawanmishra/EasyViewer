@@ -20,7 +20,43 @@ namespace EasyViewer.ViewModel
         public RelayCommand<DataGridAutoGenerateCommandArgs> AutoGenerateColumn { get; private set; }
         public RelayCommand<DataGridDoubleClickCommandArgs> DoubleClickCommand { get; private set; } 
         public ObservableCollection<QueryData> DataItems { get; set; }
-        public List<String> DataBases { get; set; }
+        public ObservableCollection<String> DataTables { get; set; } 
+        public IList<String> DataBases { get; set; }
+
+        private string _chosenDB ;
+        public String ChosenDB
+        {
+            get { return _chosenDB; }
+            set
+            {
+                if (_chosenDB != value)
+                {
+                    _chosenDB = value;
+                    FetchDataTablesQuery(value);
+                }
+            }
+        }
+
+        private string _chosenTable;
+        public String ChosenTable
+        {
+            get { return _chosenTable; }
+            set
+            {
+                if (_chosenTable != value)
+                {
+                    _chosenTable = value;
+                  //  ABCO();
+                }
+            }
+            
+        }
+
+        private void ABCO()
+        {
+            throw new NotImplementedException();
+        }
+
 
         public MainViewModel(IDataService dataService)
         {
@@ -29,6 +65,7 @@ namespace EasyViewer.ViewModel
             AutoGenerateColumn = new RelayCommand<DataGridAutoGenerateCommandArgs>(AutoGenerateColumnHandler);
             DoubleClickCommand = new RelayCommand<DataGridDoubleClickCommandArgs>(DataGridDoubleClickHandler);
             DataItems = new ObservableCollection<QueryData>();
+            DataTables = new ObservableCollection<string>();
             DataBases = new List<string>();
 
            FetchDatabasesQuery();
@@ -41,9 +78,22 @@ namespace EasyViewer.ViewModel
         ////    base.Cleanup();
         ////}
 
+        public void FetchDataTablesQuery(string value)
+        {
+            var data = _dataService.FetchQueryData(value, "SELECT Table_schema +'.'+TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'");
+            var dataTable = data.QueryDataTable;
+            var datatableRow = dataTable.Rows;
+            foreach (DataRow dr in datatableRow)
+            {
+
+                var a = dr.ItemArray[0];
+                DataTables.Add(a.ToString());
+            }
+        }
+
         public void FetchDatabasesQuery()
         {
-            var data = _dataService.FetchQueryData("master", "select name from sys.databases");
+            var data = _dataService.FetchQueryData("master", "select name from sys.databases order by name");
             var dataTable = data.QueryDataTable;
             var datatableRow = dataTable.Rows;
             foreach (DataRow dr in datatableRow)
