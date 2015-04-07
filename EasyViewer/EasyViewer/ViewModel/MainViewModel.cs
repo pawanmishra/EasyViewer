@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
@@ -17,27 +18,39 @@ namespace EasyViewer.ViewModel
         public static int Counter = 0;
         private readonly IDataService _dataService;
         private readonly IViewerService _viewerService;
+        private readonly IMasterDataService _masterDataService;
 
-        public RelayCommand ExecuteQuery { get; private set; }
+        public RelayCommand<String> ExecuteQuery { get; private set; }
         public RelayCommand<DataGridAutoGenerateCommandArgs> AutoGenerateColumn { get; private set; }
         public RelayCommand<DataGridDoubleClickCommandArgs> DoubleClickCommand { get; private set; }
         public RelayCommand<ContextMenuItemCommandArgs> ContextMenuCommand { get; private set; }
         public RelayCommand<int> RemoveTableFromGridCommand { get; private set; } 
         public ObservableCollection<QueryData> DataItems { get; set; }
+        public ObservableCollection<String> DataBases { get; set; }
+        public ObservableCollection<String> Tables { get; set; } 
+        public Dictionary<String, IEnumerable<String>> DataTablesDictionary { get; set; } 
 
         private readonly Dictionary<string, List<ForeignKeyMetaData>> _metaData;
 
-        public MainViewModel(IDataService dataService, IViewerService viewerService)
+        public MainViewModel(IDataService dataService, IViewerService viewerService,
+            IMasterDataService masterDataService)
         {
             _dataService = dataService;
             _viewerService = viewerService;
+            _masterDataService = masterDataService;
             _metaData = new Dictionary<string, List<ForeignKeyMetaData>>();
-            ExecuteQuery = new RelayCommand(ExecuteDbQuery);
+            ExecuteQuery = new RelayCommand<string>(ExecuteDbQuery);
             AutoGenerateColumn = new RelayCommand<DataGridAutoGenerateCommandArgs>(AutoGenerateColumnHandler);
             DoubleClickCommand = new RelayCommand<DataGridDoubleClickCommandArgs>(DataGridDoubleClickHandler);
             ContextMenuCommand = new RelayCommand<ContextMenuItemCommandArgs>(ContextMenuHandler);
             RemoveTableFromGridCommand = new RelayCommand<int>(RemoveTableFromGrid);
             DataItems = new ObservableCollection<QueryData>();
+            DataTablesDictionary = new Dictionary<string, IEnumerable<string>>();
+            DataBases = new ObservableCollection<string>();
+            DataBases.Add("--- Select Database ---");
+            Tables = new ObservableCollection<string>();
+
+            FetchDatabasesQuery();
         }
 
         ////public override void Cleanup()
@@ -47,10 +60,65 @@ namespace EasyViewer.ViewModel
         ////    base.Cleanup();
         ////}
 
-        private void ExecuteDbQuery()
+        private string _chosenDb;
+        public String ChosenDb
         {
-            var data = _dataService.FetchQueryData("TSQL2012", "Orders",
-                "select top(2) * from sales.orders");
+            get { return _chosenDb; }
+            set
+            {
+                if (_chosenDb != value)
+                {
+                    _chosenDb = value;
+                    FetchDataTablesQuery(value);
+                }
+            }
+        }
+
+        private string _chosenTable;
+        public String ChoseTable
+        {
+            get { return _chosenTable; }
+            set
+            {
+                if (value != null && _chosenTable != value)
+                {
+                    _chosenTable = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fetach all the tables for a given database
+        /// </summary>
+        /// <param name="database">database name for which list of tables have to be retrieved</param>
+        public void FetchDataTablesQuery(string database)
+        {
+            Tables.Clear();
+            if (!DataTablesDictionary.ContainsKey(database))
+            {
+                DataTablesDictionary.Add(database, _masterDataService.GetAllTablesForGivenDatabase(database));
+            }
+
+            foreach (var item in DataTablesDictionary[database])
+            {
+                Tables.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Featch all the database for a given SQL Server Instance
+        /// </summary>
+        public void FetchDatabasesQuery()
+        {
+            foreach (var item in _masterDataService.GetAllDatabases())
+            {
+                DataBases.Add(item);
+            }
+        }
+
+        private void ExecuteDbQuery(string query)
+        {
+            var data = _dataService.FetchQueryData(ChosenDb, ChoseTable, query);
             AddQueryData(data);
         }
 
@@ -61,14 +129,14 @@ namespace EasyViewer.ViewModel
         {
             ForeignKeyMetaData data = null;
             List<ForeignKeyMetaData> metaData;
-            if (_metaData.ContainsKey("TSQL2012"))
+            if (_metaData.ContainsKey(ChosenDb))
             {
-                metaData = _metaData["TSQL2012"];
+                metaData = _metaData[ChosenDb];
             }
             else
             {
-                metaData = _dataService.GetForeignKeyMetaData("TSQL2012");
-                _metaData.Add("TSQL2012", metaData);
+                metaData = _dataService.GetForeignKeyMetaData(ChosenDb);
+                _metaData.Add(ChosenDb, metaData);
             }
 
             data = metaData.FirstOrDefault(x => x.CurrentColumn ==
@@ -86,8 +154,8 @@ namespace EasyViewer.ViewModel
         /// </summary>
         private void DataGridDoubleClickHandler(DataGridDoubleClickCommandArgs args)
         {
-            var frameworkMetaData = _metaData["TSQL2012"];
-            var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData);
+            var frameworkMetaData = _metaData[ChosenDb];
+            var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData, ChosenDb);
             if (returnedData != null)
             {   
                 AddQueryData(returnedData);

@@ -9,7 +9,7 @@ namespace EasyViewer.Dto
     public class ForeignKeyMetaData
     {
         public string CurrentColumn { get; set; }
-        public string CurrentTable { get; set; }
+        public string CurrentTable { get ; set; }
         public string CurrentTableSchema { get; set; }
         public string ReferencedTable { get; set; }
         public string ReferencedColumn { get; set; }
@@ -20,11 +20,11 @@ namespace EasyViewer.Dto
             string referencedTable, string referencedColumn, string referencedTableSchema)
         {
             this.CurrentColumn = currentColumn;
-            this.CurrentTable = currentTable;
             this.CurrentTableSchema = currentTableSchema;
+            this.CurrentTable = currentTableSchema + "." + currentTable;
             this.ReferencedColumn = referencedColumn;
-            this.ReferencedTable = referencedTable;
             this.ReferencedTableSchema = referencedTableSchema;
+            this.ReferencedTable = referencedTableSchema + "." + referencedTable;
         }
     }
 }
