@@ -75,7 +75,7 @@ namespace EasyViewer.ViewModel
         }
 
         private string _chosenTable;
-        public String ChoseTable
+        public String ChosenTable
         {
             get { return _chosenTable; }
             set
@@ -118,7 +118,7 @@ namespace EasyViewer.ViewModel
 
         private void ExecuteDbQuery(string query)
         {
-            var data = _dataService.FetchQueryData(ChosenDb, ChoseTable, query);
+            var data = _dataService.FetchQueryData(ChosenDb, ChosenTable, query);
             AddQueryData(data);
         }
 
