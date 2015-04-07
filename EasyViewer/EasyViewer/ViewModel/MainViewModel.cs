@@ -18,62 +18,38 @@ namespace EasyViewer.ViewModel
         public static int Counter = 0;
         private readonly IDataService _dataService;
         private readonly IViewerService _viewerService;
+        private readonly IMasterDataService _masterDataService;
 
-        public RelayCommand ExecuteQuery { get; private set; }
+        public RelayCommand<String> ExecuteQuery { get; private set; }
         public RelayCommand<DataGridAutoGenerateCommandArgs> AutoGenerateColumn { get; private set; }
         public RelayCommand<DataGridDoubleClickCommandArgs> DoubleClickCommand { get; private set; }
         public RelayCommand<ContextMenuItemCommandArgs> ContextMenuCommand { get; private set; }
         public RelayCommand<int> RemoveTableFromGridCommand { get; private set; } 
         public ObservableCollection<QueryData> DataItems { get; set; }
+        public IEnumerable<String> DataBases { get; set; }
+        public ObservableCollection<String> Tables { get; set; } 
+        public Dictionary<String, IEnumerable<String>> DataTablesDictionary { get; set; } 
 
         private readonly Dictionary<string, List<ForeignKeyMetaData>> _metaData;
 
-
-        public ObservableCollection<String> DataTables { get; set; } 
-        public IList<String> DataBases { get; set; }
-
-        private string _chosenDB ;
-        public String ChosenDB
-        {
-            get { return _chosenDB; }
-            set
-            {
-                if (_chosenDB != value)
-                {
-                    _chosenDB = value;
-                    FetchDataTablesQuery(value);
-                }
-            }
-        }
-
-        private string _queryString;
-        public String QueryString
-        {
-            get { return _queryString; }
-            set
-            {
-                if (_queryString != value)
-                {
-                    _queryString = value;
-                }
-            }
-        }
-
-        public MainViewModel(IDataService dataService, IViewerService viewerService)
+        public MainViewModel(IDataService dataService, IViewerService viewerService,
+            IMasterDataService masterDataService)
         {
             _dataService = dataService;
             _viewerService = viewerService;
+            _masterDataService = masterDataService;
             _metaData = new Dictionary<string, List<ForeignKeyMetaData>>();
-            ExecuteQuery = new RelayCommand(ExecuteDbQuery);
+            ExecuteQuery = new RelayCommand<string>(ExecuteDbQuery);
             AutoGenerateColumn = new RelayCommand<DataGridAutoGenerateCommandArgs>(AutoGenerateColumnHandler);
             DoubleClickCommand = new RelayCommand<DataGridDoubleClickCommandArgs>(DataGridDoubleClickHandler);
             ContextMenuCommand = new RelayCommand<ContextMenuItemCommandArgs>(ContextMenuHandler);
             RemoveTableFromGridCommand = new RelayCommand<int>(RemoveTableFromGrid);
             DataItems = new ObservableCollection<QueryData>();
-            DataTables = new ObservableCollection<string>();
+            DataTablesDictionary = new Dictionary<string, IEnumerable<string>>();
             DataBases = new List<string>();
+            Tables = new ObservableCollection<string>();
 
-           FetchDatabasesQuery();
+            FetchDatabasesQuery();
         }
 
         ////public override void Cleanup()
@@ -83,35 +59,62 @@ namespace EasyViewer.ViewModel
         ////    base.Cleanup();
         ////}
 
-        public void FetchDataTablesQuery(string DB)
+        private string _chosenDb;
+        public String ChosenDb
         {
-            var data = _dataService.FetchQueryData(DB, "INFORMATION_SCHEMA.TABLES", "SELECT Table_schema +'.'+TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'");
-            var dataTable = data.QueryDataTable;
-            var datatableRow = dataTable.Rows;
-            foreach (DataRow dr in datatableRow)
+            get { return _chosenDb; }
+            set
             {
-
-                var a = dr.ItemArray[0];
-                DataTables.Add(a.ToString());
+                if (_chosenDb != value)
+                {
+                    _chosenDb = value;
+                    FetchDataTablesQuery(value);
+                }
             }
         }
 
+        private string _chosenTable;
+        public String ChoseTable
+        {
+            get { return _chosenTable; }
+            set
+            {
+                if (value != null && _chosenTable != value)
+                {
+                    _chosenTable = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fetach all the tables for a given database
+        /// </summary>
+        /// <param name="database">database name for which list of tables have to be retrieved</param>
+        public void FetchDataTablesQuery(string database)
+        {
+            Tables.Clear();
+            if (!DataTablesDictionary.ContainsKey(database))
+            {
+                DataTablesDictionary.Add(database, _masterDataService.GetAllTablesForGivenDatabase(database));
+            }
+
+            foreach (var item in DataTablesDictionary[database])
+            {
+                Tables.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Featch all the database for a given SQL Server Instance
+        /// </summary>
         public void FetchDatabasesQuery()
         {
-            var data = _dataService.FetchQueryData("master","sys.databases", "select name from sys.databases order by name");
-            var dataTable = data.QueryDataTable;
-            var datatableRow = dataTable.Rows;
-            foreach (DataRow dr in datatableRow)
-            {
-
-                var a = dr.ItemArray[0];
-                DataBases.Add(a.ToString());
-            }
+            DataBases = _masterDataService.GetAllDatabases();
         }
 
-        private void ExecuteDbQuery()
+        private void ExecuteDbQuery(string query)
         {
-            var data = _dataService.FetchQueryData(ChosenDB, "SalesOrderDetail", "select top(2) * from sales.SalesOrderDetail");
+            var data = _dataService.FetchQueryData(ChosenDb, ChoseTable, query);
             AddQueryData(data);
         }
 
@@ -122,14 +125,14 @@ namespace EasyViewer.ViewModel
         {
             ForeignKeyMetaData data = null;
             List<ForeignKeyMetaData> metaData;
-            if (_metaData.ContainsKey(ChosenDB))
+            if (_metaData.ContainsKey(ChosenDb))
             {
-                metaData = _metaData[ChosenDB];
+                metaData = _metaData[ChosenDb];
             }
             else
             {
-                metaData = _dataService.GetForeignKeyMetaData(ChosenDB);
-                _metaData.Add(ChosenDB, metaData);
+                metaData = _dataService.GetForeignKeyMetaData(ChosenDb);
+                _metaData.Add(ChosenDb, metaData);
             }
 
             data = metaData.FirstOrDefault(x => x.CurrentColumn ==
@@ -147,7 +150,7 @@ namespace EasyViewer.ViewModel
         /// </summary>
         private void DataGridDoubleClickHandler(DataGridDoubleClickCommandArgs args)
         {
-            var frameworkMetaData = _metaData[ChosenDB];
+            var frameworkMetaData = _metaData[ChosenDb];
             var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData);
             if (returnedData != null)
             {   

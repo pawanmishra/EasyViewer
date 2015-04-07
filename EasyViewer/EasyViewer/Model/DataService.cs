@@ -12,6 +12,7 @@ namespace EasyViewer.Model
     {
         private readonly string _connectionStringFormat = ConfigurationManager.AppSettings["ConnectionStringFormat"];
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public QueryData FetchQueryData(string dataBase, string tableName, string query)
         {
             string connectionString = string.Format(_connectionStringFormat, dataBase);

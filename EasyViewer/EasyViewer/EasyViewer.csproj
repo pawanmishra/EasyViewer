@@ -82,7 +82,9 @@
     <Compile Include="Dto\QueryData.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
+    <Compile Include="Model\IMasterDataService.cs" />
     <Compile Include="Model\IViewerService.cs" />
+    <Compile Include="Model\MasterDataService.cs" />
     <Compile Include="Model\ViewerService.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

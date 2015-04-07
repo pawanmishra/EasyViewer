@@ -1,124 +1,112 @@
 ﻿<Window x:Class="EasyViewer.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.WPF45"
-        xmlns:ignore="http://www.ignore.com"
-        xmlns:command="http://www.galasoft.ch/mvvmlight"
-        mc:Ignorable="d ignore"
-        WindowState="Maximized"
-        Title="MVVM Light Application"
-        DataContext="{Binding Main, Source={StaticResource Locator}}">
-    
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Skins/MainSkin.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="customStyle">
-                <Setter Property="TextBox.Background" Value="Yellow"></Setter>
-                <Setter Property="TextBox.IsReadOnly" Value="True"></Setter>
-                <Style.Triggers>
-                    <Trigger Property="Control.IsMouseOver" Value="True">
-                        <Setter Property="Control.Cursor" Value="Hand"></Setter>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-        </ResourceDictionary>
-    </Window.Resources>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+		xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.WPF45"
+		xmlns:ignore="http://www.ignore.com"
+		xmlns:command="http://www.galasoft.ch/mvvmlight"
+		mc:Ignorable="d ignore"
+		WindowState="Maximized"
+		Title="MVVM Light Application"
+		DataContext="{Binding Main, Source={StaticResource Locator}}">
+	
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Skins/MainSkin.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<Style x:Key="customStyle">
+				<Setter Property="TextBox.Background" Value="Yellow"></Setter>
+				<Setter Property="TextBox.IsReadOnly" Value="True"></Setter>
+				<Style.Triggers>
+					<Trigger Property="Control.IsMouseOver" Value="True">
+						<Setter Property="Control.Cursor" Value="Hand"></Setter>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
+		</ResourceDictionary>
+	</Window.Resources>
 
-    <Grid x:Name="LayoutRoot">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="100"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <DockPanel  Grid.Row="0">
-
-            <ComboBox
-	    HorizontalAlignment="Left"
-	    VerticalAlignment="Top"
-	    Width="200"
-        ItemsSource="{Binding Path=DataBases}"
-                SelectedItem="{Binding ChosenDB}"   
-        />
-
-            <ComboBox
-	    HorizontalAlignment="Left"
-	    VerticalAlignment="Top"
-	    Width="200"
-                Name ="Qwe"
-        ItemsSource="{Binding Path=DataTables}"
-        />
-            <TextBox 
-            Height="23" 
-            HorizontalAlignment="Left" 
-            Name="textBox1"
-            VerticalAlignment="Top" 
-            Width="120"
-                Background="LightBlue"
-                Text="{Binding Path=QueryString}"/>
-            
-            <TextBlock Name="SizeTextBox" 
-                 Height="23"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 Width="200"
-           Text="{Binding ElementName=Qwe, Path=Text}"
-                     Background="LightBlue" />
-            
-            <Button Name="BtnRunBatch"
-                    Margin="3" FontSize="18" FontWeight="Bold"
-                    Foreground="Black" Background="LightGray"
-                    BorderThickness="2" 
-                    HorizontalAlignment="Center" 
-                    VerticalAlignment="Center"
-                    Command="{Binding ExecuteQuery}">Execute</Button>
-        </DockPanel>
-        <StackPanel Grid.Row="1">
-            <ItemsControl x:Name="itemControl" ItemsSource="{Binding DataItems}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical"></StackPanel>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <GroupBox Header="{Binding Path=TableName}">
-                            <GroupBox.HeaderTemplate>
-                                <DataTemplate>
-                                    <Button Content="{Binding}" 
-                                            Margin="5"
-                                            ToolTip="Click to close the table!!"
-                                            Command="{Binding ElementName=itemControl, Path=DataContext.RemoveTableFromGridCommand}">
-                                        <Button.CommandParameter>
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GroupBox}}" Path="DataContext.Counter" />
-                                        </Button.CommandParameter>
-                                    </Button>
-                                </DataTemplate>
-                            </GroupBox.HeaderTemplate>
-                            <DataGrid ItemsSource="{Binding Path=QueryDataTable}"
-                              HorizontalAlignment="Stretch"
-                              AutoGenerateColumns="True" Width="auto" 
-                              BorderThickness="1" Height="auto" IsReadOnly="True"
-                              ScrollViewer.CanContentScroll="True" 
-                              ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                              Name="DbDataGrid" Tag="{Binding Path=TableName}"
-                              AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
-                              MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
-                              CanUserAddRows="False">
-                                <DataGrid.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem x:Name="gridContext" Header="Delete" Click="MenuItem_OnClick"></MenuItem>
-                                    </ContextMenu>
-                                </DataGrid.ContextMenu>
-                            </DataGrid>
-                        </GroupBox>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
-    </Grid>
+	<Grid x:Name="LayoutRoot">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="100"></RowDefinition>
+			<RowDefinition Height="Auto"></RowDefinition>
+		</Grid.RowDefinitions>
+		<DockPanel  Grid.Row="0">
+			<ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Name="DDlDatabases"
+					  Width="200" ItemsSource="{Binding Path=DataBases}" 
+					  SelectedItem="{Binding ChosenDb}" />
+			<ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" 
+                      Width="200" Name ="DDlTables"
+					  ItemsSource="{Binding Path=Tables}" />   
+			<TextBox 
+				Height="23" 
+				HorizontalAlignment="Left" 
+				Name="txtQuery"
+				VerticalAlignment="Top" 
+				Width="120"
+				Background="LightBlue" />
+			<TextBlock Name="SizeTextBox" 
+				 Height="23"
+				 HorizontalAlignment="Left"
+				 VerticalAlignment="Top"
+				 Width="200"
+				 Text="{Binding ElementName=Qwe, Path=Text}"
+				 Background="LightBlue" />
+			<Button Name="BtnRunBatch"
+					Margin="3" FontSize="18" FontWeight="Bold"
+					Foreground="Black" Background="LightGray"
+					BorderThickness="2" 
+					HorizontalAlignment="Center" 
+					VerticalAlignment="Center"
+					Command="{Binding ExecuteQuery}"
+					CommandParameter="{Binding ElementName=txtQuery, Path=Text}">Execute</Button>
+		</DockPanel>
+		<StackPanel Grid.Row="1">
+			<ItemsControl x:Name="itemControl" ItemsSource="{Binding DataItems}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Vertical"></StackPanel>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<GroupBox Header="{Binding Path=TableName}">
+							<GroupBox.HeaderTemplate>
+								<DataTemplate>
+									<Button Content="{Binding}" 
+											Margin="5"
+											ToolTip="Click to close the table!!"
+											Command="{Binding ElementName=itemControl, Path=DataContext.RemoveTableFromGridCommand}">
+										<Button.CommandParameter>
+											<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GroupBox}}" Path="DataContext.Counter" />
+										</Button.CommandParameter>
+									</Button>
+								</DataTemplate>
+							</GroupBox.HeaderTemplate>
+							<DataGrid ItemsSource="{Binding Path=QueryDataTable}"
+							  HorizontalAlignment="Stretch"
+							  AutoGenerateColumns="True" Width="auto" 
+							  BorderThickness="1" Height="auto" IsReadOnly="True"
+							  ScrollViewer.CanContentScroll="True" 
+							  ScrollViewer.VerticalScrollBarVisibility="Auto"
+							  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+							  Name="DbDataGrid" Tag="{Binding Path=TableName}"
+							  AutoGeneratingColumn="DbDataGrid_OnAutoGeneratingColumn"
+							  MouseDoubleClick="DbDataGrid_OnMouseDoubleClick"
+							  CanUserAddRows="False">
+								<DataGrid.ContextMenu>
+									<ContextMenu>
+										<MenuItem x:Name="gridContext" Header="Delete" Click="MenuItem_OnClick"></MenuItem>
+									</ContextMenu>
+								</DataGrid.ContextMenu>
+							</DataGrid>
+						</GroupBox>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</StackPanel>
+	</Grid>
 </Window>
