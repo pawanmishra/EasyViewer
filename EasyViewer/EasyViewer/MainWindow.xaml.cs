@@ -37,5 +37,14 @@ namespace EasyViewer
             if (vm.DoubleClickCommand.CanExecute(commandArgs))
                 vm.DoubleClickCommand.Execute(commandArgs);
         }
+
+        private void MenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var grid = sender as MenuItem;
+            var commandArgs = new ContextMenuItemCommandArgs(grid, e);
+            var vm = ((MainViewModel)this.DataContext);
+            if (vm.ContextMenuCommand.CanExecute(commandArgs))
+                vm.ContextMenuCommand.Execute(commandArgs);
+        }
     }
 }

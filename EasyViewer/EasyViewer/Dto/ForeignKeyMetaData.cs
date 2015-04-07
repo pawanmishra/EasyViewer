@@ -10,17 +10,21 @@ namespace EasyViewer.Dto
     {
         public string CurrentColumn { get; set; }
         public string CurrentTable { get; set; }
+        public string CurrentTableSchema { get; set; }
         public string ReferencedTable { get; set; }
         public string ReferencedColumn { get; set; }
+        public string ReferencedTableSchema { get; set; }
         public int Value { get; set; }
 
-        public ForeignKeyMetaData(string currentColumn, string currentTable, string referencedTable,
-            string referencedColumn)
+        public ForeignKeyMetaData(string currentColumn, string currentTable, string currentTableSchema,
+            string referencedTable, string referencedColumn, string referencedTableSchema)
         {
             this.CurrentColumn = currentColumn;
             this.CurrentTable = currentTable;
+            this.CurrentTableSchema = currentTableSchema;
             this.ReferencedColumn = referencedColumn;
             this.ReferencedTable = referencedTable;
+            this.ReferencedTableSchema = referencedTableSchema;
         }
     }
 }
