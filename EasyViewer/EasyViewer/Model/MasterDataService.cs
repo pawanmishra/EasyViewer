@@ -38,8 +38,8 @@ namespace EasyViewer.Model
         public IEnumerable<string> GetAllTablesForGivenDatabase(string databaseName)
         {
             List<string> tables = new List<string>();
-            var data = _dataService.FetchQueryData(databaseName, "INFORMATION_SCHEMA.TABLES", 
-                "SELECT Table_schema + '.'+ TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'");
+            var data = _dataService.FetchQueryData(databaseName, "INFORMATION_SCHEMA.TABLES",
+                "SELECT Table_schema + '.'+ TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' order by TABLE_SCHEMA,TABLE_NAME");
             var dataTable = data.QueryDataTable;
             var datatableRow = dataTable.Rows;
             foreach (DataRow dr in datatableRow)

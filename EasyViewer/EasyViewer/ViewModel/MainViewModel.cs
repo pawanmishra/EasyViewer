@@ -66,7 +66,7 @@ namespace EasyViewer.ViewModel
             get { return _chosenDb; }
             set
             {
-                if (_chosenDb != value)
+                if (_chosenDb != value && value != "--- Select Database ---")
                 {
                     _chosenDb = value;
                     FetchDataTablesQuery(value);

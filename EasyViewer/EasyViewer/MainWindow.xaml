@@ -29,6 +29,7 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
+    <ScrollViewer>
 	<Grid x:Name="LayoutRoot">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="100"></RowDefinition>
@@ -62,6 +63,7 @@
 					Command="{Binding ExecuteQuery}"
 					CommandParameter="{Binding ElementName=txtQuery, Path=Text}">Execute</Button>
 		</StackPanel>
+
 		<StackPanel Grid.Row="1">
 			<ItemsControl x:Name="itemControl" ItemsSource="{Binding DataItems}">
 				<ItemsControl.ItemsPanel>
@@ -106,5 +108,7 @@
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 		</StackPanel>
+
 	</Grid>
+    </ScrollViewer>
 </Window>
