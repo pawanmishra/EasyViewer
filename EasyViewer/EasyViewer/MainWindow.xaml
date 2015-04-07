@@ -20,6 +20,11 @@
             <Style x:Key="customStyle">
                 <Setter Property="TextBox.Background" Value="Yellow"></Setter>
                 <Setter Property="TextBox.IsReadOnly" Value="True"></Setter>
+                <Style.Triggers>
+                    <Trigger Property="Control.IsMouseOver" Value="True">
+                        <Setter Property="Control.Cursor" Value="Hand"></Setter>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
         </ResourceDictionary>
     </Window.Resources>
@@ -88,7 +93,7 @@
                                             ToolTip="Click to close the table!!"
                                             Command="{Binding ElementName=itemControl, Path=DataContext.RemoveTableFromGridCommand}">
                                         <Button.CommandParameter>
-                                            <Binding RelativeSource="{RelativeSource AncestorType={x:Type GroupBox}}" Path="DataContext.Counter" />
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GroupBox}}" Path="DataContext.Counter" />
                                         </Button.CommandParameter>
                                     </Button>
                                 </DataTemplate>
@@ -106,7 +111,7 @@
                               CanUserAddRows="False">
                                 <DataGrid.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Delete" Click="MenuItem_OnClick"></MenuItem>
+                                        <MenuItem x:Name="gridContext" Header="Delete" Click="MenuItem_OnClick"></MenuItem>
                                     </ContextMenu>
                                 </DataGrid.ContextMenu>
                             </DataGrid>
