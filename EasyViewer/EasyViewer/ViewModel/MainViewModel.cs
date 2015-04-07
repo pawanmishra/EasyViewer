@@ -24,7 +24,9 @@ namespace EasyViewer.ViewModel
         public RelayCommand<DataGridAutoGenerateCommandArgs> AutoGenerateColumn { get; private set; }
         public RelayCommand<DataGridDoubleClickCommandArgs> DoubleClickCommand { get; private set; }
         public RelayCommand<ContextMenuItemCommandArgs> ContextMenuCommand { get; private set; }
-        public RelayCommand<int> RemoveTableFromGridCommand { get; private set; } 
+        public RelayCommand<int> RemoveTableFromGridCommand { get; private set; }
+        public RelayCommand<SqlInstanceConnectionInfo> ConnectSqlInstanceCommand { get; set; } 
+
         public ObservableCollection<QueryData> DataItems { get; set; }
         public ObservableCollection<String> DataBases { get; set; }
         public ObservableCollection<String> Tables { get; set; } 
@@ -44,10 +46,11 @@ namespace EasyViewer.ViewModel
             DoubleClickCommand = new RelayCommand<DataGridDoubleClickCommandArgs>(DataGridDoubleClickHandler);
             ContextMenuCommand = new RelayCommand<ContextMenuItemCommandArgs>(ContextMenuHandler);
             RemoveTableFromGridCommand = new RelayCommand<int>(RemoveTableFromGrid);
+            ConnectSqlInstanceCommand = new RelayCommand<SqlInstanceConnectionInfo>(ConnectToSqlInstance);
+
             DataItems = new ObservableCollection<QueryData>();
             DataTablesDictionary = new Dictionary<string, IEnumerable<string>>();
-            DataBases = new ObservableCollection<string>();
-            DataBases.Add("--- Select Database ---");
+            DataBases = new ObservableCollection<string> {"--- Select Database ---"};
             Tables = new ObservableCollection<string>();
 
             FetchDatabasesQuery();
@@ -85,6 +88,10 @@ namespace EasyViewer.ViewModel
                     _chosenTable = value;
                 }
             }
+        }
+
+        private void ConnectToSqlInstance(SqlInstanceConnectionInfo connectionInfo)
+        {   
         }
 
         /// <summary>

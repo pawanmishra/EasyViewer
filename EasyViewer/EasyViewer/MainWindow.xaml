@@ -6,8 +6,9 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.WPF45"
         xmlns:ignore="http://www.ignore.com"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:ceede="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
+        xmlns:converter="clr-namespace:EasyViewer.Converter"
         mc:Ignorable="d ignore"
         WindowState="Maximized"
         Title="MVVM Light Application"
@@ -34,6 +35,7 @@
                 <Setter Property="Background" Value="LightGray"></Setter>
                 <Setter Property="BorderThickness" Value="2"></Setter>
             </Style>
+            <converter:SqlInstanceInfoConverter x:Key="SqlInstanceConverter"></converter:SqlInstanceInfoConverter>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -49,49 +51,72 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="1.5*"></ColumnDefinition>
+                    <ColumnDefinition Width="1.5*"></ColumnDefinition>
+                    <ColumnDefinition Width="6*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Row="0" Grid.Column="0" 
-                            Grid.ColumnSpan="3" 
-                            FlowDirection="LeftToRight" Orientation="Horizontal" 
-                            VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <RadioButton VerticalAlignment="Center" Name="RdLocalInstance"></RadioButton>
-                    <TextBlock VerticalAlignment="Center" 
-                       FontWeight="Bold" FontSize="16" Margin="5,0,5,0" 
-                       Text="Local Sql Server Instance" />
-                    <RadioButton VerticalAlignment="Center" Name="RdRemote" />
-                    <TextBlock VerticalAlignment="Center" 
-                        FontWeight="Bold" FontSize="16" Margin="5,0,5,0"
-                        Text="Remote Instance" />
-                    <xctk:WatermarkTextBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" 
-                                Height="30" Width="210" Margin="5,0,5,0" Watermark="Server IP"></xctk:WatermarkTextBox>
-                    <xctk:WatermarkTextBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" 
-                                Height="30" Width="210" Margin="5,0,5,0" Watermark="Username"></xctk:WatermarkTextBox>
-                    <PasswordBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" 
-                                 Height="30" Width="210" Margin="5,0,5,0"></PasswordBox>
-                </StackPanel>
-                <Button Grid.Row="0" Grid.Column="3" Name="BtnConnect">Connect</Button>
-                <ComboBox Name="DDlDatabases" Grid.Row="1" Grid.Column="0"
+                <Grid HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1.2*"></ColumnDefinition>
+                        <ColumnDefinition Width="1.9*"></ColumnDefinition>
+                        <ColumnDefinition Width="1.9*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton VerticalAlignment="Center" Name="RdLocalInstance" Grid.Row="0" Grid.Column="0"></RadioButton>
+                    <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
+                           FontWeight="Bold" FontSize="16" Margin="20,0,5,0" 
+                           Text="Local Instance" />
+                    <RadioButton VerticalAlignment="Center" Name="RdRemote" Grid.Row="0" Grid.Column="1" />
+                    <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1"
+                            FontWeight="Bold" FontSize="16" Margin="20,0,5,0"
+                            Text="Remote Instance" />
+                    <ceede:WatermarkTextBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" Name="TxtServerInstance" Grid.Row="0" Grid.Column="2"
+                                Height="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Watermark="Server IP"></ceede:WatermarkTextBox>
+                    <ceede:WatermarkTextBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" Name="TxtUserName" Grid.Row="0" Grid.Column="3"
+                                Height="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Watermark="Username"></ceede:WatermarkTextBox>
+                    <PasswordBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" Name="TxtPassword" Grid.Row="0" Grid.Column="4"
+                                 Height="30" HorizontalAlignment="Stretch" Margin="5,0,5,0"></PasswordBox>
+                    <Button Grid.Row="0" Grid.Column="5"
+                            Name="BtnConnect"
+                            Command="{Binding ConnectSqlInstanceCommand}">
+                        <Button.CommandParameter>
+                            <MultiBinding Converter="{StaticResource SqlInstanceConverter}">
+                                <Binding ElementName="RdLocalInstance" Path="IsChecked"></Binding>
+                                <Binding ElementName="RdRemote" Path="IsChecked"></Binding>
+                                <Binding ElementName="TxtServerInstance" Path="Text"></Binding>
+                                <Binding ElementName="TxtUserName" Path="Text"></Binding>
+                                <Binding ElementName="TxtPassword" Path="Password"></Binding>
+                            </MultiBinding>
+                        </Button.CommandParameter>
+                        Connect
+                    </Button>
+                    <ComboBox Name="DDlDatabases" Grid.Row="0" Grid.Column="6"
                           VerticalAlignment="Center" 
-                          HorizontalAlignment="Left"
-                          Margin="3" Width="250"
+                          HorizontalAlignment="Stretch"
+                          Margin="3" 
                           SelectedIndex="0"
                           ItemsSource="{Binding Path=DataBases}" 
                           SelectedItem="{Binding ChosenDb}" />
-                <ComboBox Name ="DDlTables" Grid.Row="1" Grid.Column="1"
-                              VerticalAlignment="Center" 
-                              HorizontalAlignment="Left"
-                              Margin="3" Width="250"
-                              ItemsSource="{Binding Path=Tables}" 
-                              SelectedItem="{Binding ChosenTable}"/>
+                    <ComboBox Name ="DDlTables" Grid.Row="0" Grid.Column="7"
+                                  VerticalAlignment="Center" 
+                                  HorizontalAlignment="Stretch"
+                                  Margin="3" 
+                                  ItemsSource="{Binding Path=Tables}" 
+                                  SelectedItem="{Binding ChosenTable}"/>
+                </Grid>
                 <TextBox 
-                    HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"
+                    HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                     Name="txtQuery" TextAlignment="Left" TextWrapping="Wrap"
                     VerticalAlignment="Center" FontSize="16" 
-                    MinHeight="32" Width="500" />
+                    MinHeight="32" />
                 <Button Name="BtnRunBatch" Grid.Row="1" Grid.Column="3"
                         Command="{Binding ExecuteQuery}"
                         CommandParameter="{Binding ElementName=txtQuery, Path=Text}">Execute</Button>
