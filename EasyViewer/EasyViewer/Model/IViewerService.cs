@@ -9,6 +9,6 @@ namespace EasyViewer.Model
 {
     public interface IViewerService
     {
-        QueryData ProcessGridDoubleClick(DataGridDoubleClickCommandArgs args, List<ForeignKeyMetaData> metaData);
+        QueryData ProcessGridDoubleClick(DataGridDoubleClickCommandArgs args, List<ForeignKeyMetaData> metaData, string database);
     }
 }

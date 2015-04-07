@@ -26,7 +26,7 @@ namespace EasyViewer.ViewModel
         public RelayCommand<ContextMenuItemCommandArgs> ContextMenuCommand { get; private set; }
         public RelayCommand<int> RemoveTableFromGridCommand { get; private set; } 
         public ObservableCollection<QueryData> DataItems { get; set; }
-        public IEnumerable<String> DataBases { get; set; }
+        public ObservableCollection<String> DataBases { get; set; }
         public ObservableCollection<String> Tables { get; set; } 
         public Dictionary<String, IEnumerable<String>> DataTablesDictionary { get; set; } 
 
@@ -46,7 +46,8 @@ namespace EasyViewer.ViewModel
             RemoveTableFromGridCommand = new RelayCommand<int>(RemoveTableFromGrid);
             DataItems = new ObservableCollection<QueryData>();
             DataTablesDictionary = new Dictionary<string, IEnumerable<string>>();
-            DataBases = new List<string>();
+            DataBases = new ObservableCollection<string>();
+            DataBases.Add("--- Select Database ---");
             Tables = new ObservableCollection<string>();
 
             FetchDatabasesQuery();
@@ -109,7 +110,10 @@ namespace EasyViewer.ViewModel
         /// </summary>
         public void FetchDatabasesQuery()
         {
-            DataBases = _masterDataService.GetAllDatabases();
+            foreach (var item in _masterDataService.GetAllDatabases())
+            {
+                DataBases.Add(item);
+            }
         }
 
         private void ExecuteDbQuery(string query)
@@ -151,7 +155,7 @@ namespace EasyViewer.ViewModel
         private void DataGridDoubleClickHandler(DataGridDoubleClickCommandArgs args)
         {
             var frameworkMetaData = _metaData[ChosenDb];
-            var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData);
+            var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData, ChosenDb);
             if (returnedData != null)
             {   
                 AddQueryData(returnedData);
