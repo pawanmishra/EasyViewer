@@ -19,6 +19,7 @@ namespace EasyViewer.ViewModel
         private readonly IDataService _dataService;
         private readonly IViewerService _viewerService;
         private readonly IMasterDataService _masterDataService;
+        private readonly IConnectionInfoService _connectionInfoService;
 
         public RelayCommand<String> ExecuteQuery { get; private set; }
         public RelayCommand<DataGridAutoGenerateCommandArgs> AutoGenerateColumn { get; private set; }
@@ -35,11 +36,13 @@ namespace EasyViewer.ViewModel
         private readonly Dictionary<string, List<ForeignKeyMetaData>> _metaData;
 
         public MainViewModel(IDataService dataService, IViewerService viewerService,
-            IMasterDataService masterDataService)
+            IMasterDataService masterDataService, IConnectionInfoService connectionInfoService)
         {
             _dataService = dataService;
             _viewerService = viewerService;
             _masterDataService = masterDataService;
+            _connectionInfoService = connectionInfoService;
+
             _metaData = new Dictionary<string, List<ForeignKeyMetaData>>();
             ExecuteQuery = new RelayCommand<string>(ExecuteDbQuery);
             AutoGenerateColumn = new RelayCommand<DataGridAutoGenerateCommandArgs>(AutoGenerateColumnHandler);
@@ -50,10 +53,8 @@ namespace EasyViewer.ViewModel
 
             DataItems = new ObservableCollection<QueryData>();
             DataTablesDictionary = new Dictionary<string, IEnumerable<string>>();
-            DataBases = new ObservableCollection<string> {"--- Select Database ---"};
+            DataBases = new ObservableCollection<string>();
             Tables = new ObservableCollection<string>();
-
-            FetchDatabasesQuery();
         }
 
         ////public override void Cleanup()
@@ -90,8 +91,21 @@ namespace EasyViewer.ViewModel
             }
         }
 
+        public string RemoteInstancePassword { get; set; }
+
         private void ConnectToSqlInstance(SqlInstanceConnectionInfo connectionInfo)
-        {   
+        {
+            connectionInfo.Password = RemoteInstancePassword;
+            _connectionInfoService.InitializeConnectionString(connectionInfo);
+            ResetApp();
+            FetchDatabasesQuery();
+        }
+
+        private void ResetApp()
+        {
+            DataItems.Clear();
+            Tables.Clear();
+            DataBases.Clear();
         }
 
         /// <summary>

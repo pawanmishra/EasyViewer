@@ -12,11 +12,13 @@ namespace EasyViewer.Converter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var connectionInfo = new SqlInstanceConnectionInfo();
-            connectionInfo.IsLocalInstace = bool.Parse(values[0].ToString());
-            connectionInfo.IsRemoteInstance = bool.Parse(values[1].ToString());
-            connectionInfo.ServerInstance = values[2].ToString();
-            connectionInfo.UserName = values[3].ToString();
+            var connectionInfo = new SqlInstanceConnectionInfo
+            {
+                IsLocalInstace = bool.Parse(values[0].ToString()),
+                IsRemoteInstance = bool.Parse(values[1].ToString()),
+                ServerInstance = values[2].ToString(),
+                UserName = values[3].ToString()
+            };
             return connectionInfo;
         }
 

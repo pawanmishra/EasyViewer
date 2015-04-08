@@ -9,6 +9,7 @@
         xmlns:ceede="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         xmlns:converter="clr-namespace:EasyViewer.Converter"
+        xmlns:pwd="clr-namespace:EasyViewer.Helper"
         mc:Ignorable="d ignore"
         WindowState="Maximized"
         Title="MVVM Light Application"
@@ -73,17 +74,20 @@
                     <RadioButton VerticalAlignment="Center" Name="RdLocalInstance" Grid.Row="0" Grid.Column="0"></RadioButton>
                     <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"
                            FontWeight="Bold" FontSize="16" Margin="20,0,5,0" 
-                           Text="Local Instance" />
+                           Text="Local" />
                     <RadioButton VerticalAlignment="Center" Name="RdRemote" Grid.Row="0" Grid.Column="1" />
                     <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="1"
                             FontWeight="Bold" FontSize="16" Margin="20,0,5,0"
-                            Text="Remote Instance" />
+                            Text="Remote" />
                     <ceede:WatermarkTextBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" Name="TxtServerInstance" Grid.Row="0" Grid.Column="2"
                                 Height="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Watermark="Server IP"></ceede:WatermarkTextBox>
                     <ceede:WatermarkTextBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" Name="TxtUserName" Grid.Row="0" Grid.Column="3"
                                 Height="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Watermark="Username"></ceede:WatermarkTextBox>
                     <PasswordBox IsEnabled="{Binding ElementName=RdRemote, Path=IsChecked}" Name="TxtPassword" Grid.Row="0" Grid.Column="4"
-                                 Height="30" HorizontalAlignment="Stretch" Margin="5,0,5,0"></PasswordBox>
+                                 Height="30" 
+                                 pwd:PasswordHelper.Attach="True"
+                                 pwd:PasswordHelper.Password="{Binding Path=RemoteInstancePassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 HorizontalAlignment="Stretch" Margin="5,0,5,0"></PasswordBox>
                     <Button Grid.Row="0" Grid.Column="5"
                             Name="BtnConnect"
                             Command="{Binding ConnectSqlInstanceCommand}">
@@ -93,7 +97,6 @@
                                 <Binding ElementName="RdRemote" Path="IsChecked"></Binding>
                                 <Binding ElementName="TxtServerInstance" Path="Text"></Binding>
                                 <Binding ElementName="TxtUserName" Path="Text"></Binding>
-                                <Binding ElementName="TxtPassword" Path="Password"></Binding>
                             </MultiBinding>
                         </Button.CommandParameter>
                         Connect

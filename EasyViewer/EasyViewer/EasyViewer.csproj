@@ -100,7 +100,10 @@
     <Compile Include="Dto\ForeignKeyMetaData.cs" />
     <Compile Include="Dto\QueryData.cs" />
     <Compile Include="Dto\SqlInstanceConnectionInfo.cs" />
+    <Compile Include="Helper\PasswordHelper.cs" />
+    <Compile Include="Model\ConnectionInfoService.cs" />
     <Compile Include="Model\DataService.cs" />
+    <Compile Include="Model\IConnectionInfoService.cs" />
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\IMasterDataService.cs" />
     <Compile Include="Model\IViewerService.cs" />
