@@ -9,9 +9,9 @@ namespace EasyViewer.Model
 {
     public class MasterDataService : IMasterDataService
     {
-        private const string MASTER_DB = "master";
-        private const string SYS_DATABASE = "sys.databases";
-        private const string FETCH_DATABASE_QUERY = "select name from sys.databases order by name";
+        private const string MasterDb = "master";
+        private const string SysDatabase = "sys.databases";
+        private const string FetchDatabaseQuery = "select name from sys.databases order by name";
 
         private readonly IDataService _dataService;
 
@@ -23,7 +23,7 @@ namespace EasyViewer.Model
         public IEnumerable<string> GetAllDatabases()
         {
             List<string> dataBases = new List<string>();
-            var data = _dataService.FetchQueryData(MASTER_DB, SYS_DATABASE, FETCH_DATABASE_QUERY);
+            var data = _dataService.FetchQueryData(MasterDb, SysDatabase, FetchDatabaseQuery);
             var dataTable = data.QueryDataTable;
             var datatableRow = dataTable.Rows;
 

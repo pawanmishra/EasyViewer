@@ -37,6 +37,7 @@ namespace EasyViewer.ViewModel
                 SimpleIoc.Default.Register<IDataService, DataService>();
                 SimpleIoc.Default.Register<IViewerService, ViewerService>();
                 SimpleIoc.Default.Register<IMasterDataService, MasterDataService>();
+                SimpleIoc.Default.Register<IConnectionInfoService, ConnectionInfoService>();
             }
 
             SimpleIoc.Default.Register<MainViewModel>();
