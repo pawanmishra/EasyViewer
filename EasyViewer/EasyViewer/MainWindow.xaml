@@ -119,6 +119,7 @@
                     HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                     Name="txtQuery" TextAlignment="Left" TextWrapping="Wrap"
                     VerticalAlignment="Center" FontSize="16" 
+                    Text="{Binding Path=Query, Mode=TwoWay}"
                     MinHeight="32" />
                 <Button Name="BtnRunBatch" Grid.Row="1" Grid.Column="3"
                         Command="{Binding ExecuteQuery}"

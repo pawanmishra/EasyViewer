@@ -18,6 +18,7 @@ namespace EasyViewer.ViewModel
     public class MainViewModel : ViewModelBase
     {
         public static int Counter = 0;
+        private const string DefaultQueryFormat = "Select top(5) * From {0} ";
         private readonly IDataService _dataService;
         private readonly IViewerService _viewerService;
         private readonly IMasterDataService _masterDataService;
@@ -80,8 +81,25 @@ namespace EasyViewer.ViewModel
             }
         }
 
-        public String ChosenTable { get; set; }
+        private string _chosenTable;
+
+        public String ChosenTable
+        {
+            get { return _chosenTable; }
+            set
+            {
+                _chosenTable = value;
+                Query = string.Format(DefaultQueryFormat, _chosenTable);
+            }
+        }
         public string RemoteInstancePassword { get; set; }
+
+        private string _query;
+        public string Query
+        {
+            get { return _query; }
+            set { Set(() => Query, ref _query, value); }
+        }
 
         private void ConnectToSqlInstance(SqlInstanceConnectionInfo connectionInfo)
         {
