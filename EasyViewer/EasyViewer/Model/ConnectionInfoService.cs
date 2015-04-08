@@ -22,9 +22,9 @@ namespace EasyViewer.Model
 
         public void InitializeConnectionString(SqlInstanceConnectionInfo connectionInfo)
         {
+            _isRemoteConnection = connectionInfo.IsRemoteInstance;
             if (connectionInfo.IsRemoteInstance)
-            {
-                _isRemoteConnection = connectionInfo.IsRemoteInstance;
+            {   
                 _serverInstance = connectionInfo.ServerInstance;
                 _userName = connectionInfo.UserName;
                 _password = connectionInfo.Password;

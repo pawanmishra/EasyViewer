@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using EasyViewer.Dto;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
+using System.Threading.Tasks;
 
 namespace EasyViewer.Model
 {
@@ -43,20 +45,50 @@ namespace EasyViewer.Model
                 var srv = new Server(serverConnection);
                 Database db = srv.Databases[dataBase];
 
-                foreach (Table tb in db.Tables)
-                {
-                    foreach (ForeignKey f in tb.ForeignKeys)
+                Parallel.ForEach(db.Tables.Cast<Table>(),
+                    () => new List<ForeignKeyMetaData>(),
+                    (item, loopBody, localState) =>
                     {
-                        foreach (ForeignKeyColumn data in f.Columns)
+                        foreach (ForeignKey f in item.ForeignKeys)
                         {
-                            lst.Add(new ForeignKeyMetaData(data.Name, tb.Name, tb.Schema,
-                                f.ReferencedTable, data.ReferencedColumn, f.ReferencedTableSchema));
+                            foreach (ForeignKeyColumn data in f.Columns)
+                            {
+                                localState.Add(new ForeignKeyMetaData(data.Name, item.Name, item.Schema,
+                                    f.ReferencedTable, data.ReferencedColumn, f.ReferencedTableSchema));
+                            }
                         }
-                    }
-                }
+                        return localState;
+                    },
+                    (localState) =>
+                    {
+                        lock (lst)
+                        {
+                            lst.AddRange(localState);
+                        }
+                    });
             }
 
             return lst;
+        }
+
+        public async Task<List<string>> ExecuteQuery(string dataBase, string query)
+        {
+            var items = new List<string>();
+            string connectionString = _connectionInfoService.GetConnectionString(dataBase);
+
+            using (var conn = new SqlConnection(connectionString))
+            using(SqlCommand command = new SqlCommand(query, conn))
+            {
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        items.Add(reader.GetFieldValue<string>(0));
+                    }
+                    return items;
+                }
+            }
         }
     }
 }

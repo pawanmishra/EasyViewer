@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -78,19 +80,7 @@ namespace EasyViewer.ViewModel
             }
         }
 
-        private string _chosenTable;
-        public String ChosenTable
-        {
-            get { return _chosenTable; }
-            set
-            {
-                if (value != null && _chosenTable != value)
-                {
-                    _chosenTable = value;
-                }
-            }
-        }
-
+        public String ChosenTable { get; set; }
         public string RemoteInstancePassword { get; set; }
 
         private void ConnectToSqlInstance(SqlInstanceConnectionInfo connectionInfo)
@@ -103,6 +93,7 @@ namespace EasyViewer.ViewModel
 
         private void ResetApp()
         {
+            Counter = 0;
             DataItems.Clear();
             Tables.Clear();
             DataBases.Clear();
@@ -115,12 +106,25 @@ namespace EasyViewer.ViewModel
         public void FetchDataTablesQuery(string database)
         {
             Tables.Clear();
-            if (!DataTablesDictionary.ContainsKey(database))
+            if (DataTablesDictionary.ContainsKey(database))
             {
-                DataTablesDictionary.Add(database, _masterDataService.GetAllTablesForGivenDatabase(database));
+                foreach (var item in DataTablesDictionary[database])
+                {
+                    Tables.Add(item);
+                }
+                return;
             }
 
-            foreach (var item in DataTablesDictionary[database])
+            _masterDataService.GetAllTablesForGivenDatabase(database)
+                .ContinueWith(task => BindTables(task.Result, database),
+                    TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void BindTables(IList<string> tables, string database)
+        {
+            DataTablesDictionary.Add(database, tables);
+
+            foreach (var item in tables)
             {
                 Tables.Add(item);
             }
@@ -131,7 +135,20 @@ namespace EasyViewer.ViewModel
         /// </summary>
         public void FetchDatabasesQuery()
         {
-            foreach (var item in _masterDataService.GetAllDatabases())
+            try
+            {
+                _masterDataService.GetAllDatabases()
+                    .ContinueWith(task => BindDatabase(task.Result), TaskScheduler.FromCurrentSynchronizationContext());
+            }
+            catch (Exception ex)
+            {
+                // ToDo handle exceptions
+            }
+        }
+
+        private void BindDatabase(IEnumerable<string> items)
+        {
+            foreach(var item in items)
             {
                 DataBases.Add(item);
             }
