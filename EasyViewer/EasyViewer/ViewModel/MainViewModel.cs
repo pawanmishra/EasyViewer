@@ -115,9 +115,18 @@ namespace EasyViewer.ViewModel
                 return;
             }
 
-            _masterDataService.GetAllTablesForGivenDatabase(database)
-                .ContinueWith(task => BindTables(task.Result, database),
+            if (!_metaData.ContainsKey(database))
+            {
+                _dataService.GetKeyMetaData(database)
+                    .ContinueWith(task => InitializeForeignKeyMetadata(database, task.Result));
+            }
+            _masterDataService.GetAllTablesForGivenDatabase(database).ContinueWith(task => BindTables(task.Result, database),
                     TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void InitializeForeignKeyMetadata(string database, List<ForeignKeyMetaData> list)
+        {
+            _metaData.Add(database, list);
         }
 
         private void BindTables(IList<string> tables, string database)

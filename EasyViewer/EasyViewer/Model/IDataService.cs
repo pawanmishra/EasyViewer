@@ -13,5 +13,6 @@ namespace EasyViewer.Model
         Task<List<string>> ExecuteQuery(string database, string query);
         QueryData FetchQueryData(string dataBase, string tableName, string query);
         List<ForeignKeyMetaData> GetForeignKeyMetaData(string dataBase);
+        Task<List<ForeignKeyMetaData>> GetKeyMetaData(string dataBase);
     }
 }
