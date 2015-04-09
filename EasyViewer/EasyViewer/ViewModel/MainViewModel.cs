@@ -73,8 +73,8 @@ namespace EasyViewer.ViewModel
                 }
             }
         }
-        private string _exceptionErrorMessage;
 
+        private string _exceptionErrorMessage;
         public String ExceptionErrorMessage
         {
             get { return _exceptionErrorMessage; }
@@ -94,13 +94,6 @@ namespace EasyViewer.ViewModel
         }
         public string RemoteInstancePassword { get; set; }
 
-        private bool _showExpander;
-        public bool ShowExpander
-        {
-            get { return _showExpander; }
-            set { Set(() => ShowExpander, ref _showExpander, value); }
-        }
-
         private string _query;
         public string Query
         {
@@ -108,6 +101,9 @@ namespace EasyViewer.ViewModel
             set { Set(() => Query, ref _query, value); }
         }
 
+        /// <summary>
+        /// Initialize Sql Server connection instance i.e. local or remote instance
+        /// </summary>
         private void ConnectToSqlInstance(SqlInstanceConnectionInfo connectionInfo)
         {
             try
@@ -119,14 +115,14 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
         private void ResetApp()
         {
             Counter = 0;
+            ExceptionErrorMessage = string.Empty;
             DataItems.Clear();
             Tables.Clear();
             DataBases.Clear();
@@ -152,7 +148,7 @@ namespace EasyViewer.ViewModel
 
                 if (!_metaData.ContainsKey(database))
                 {
-                    _dataService.GetKeyMetaData(database)
+                    _masterDataService.GetKeyMetaData(database)
                         .ContinueWith(task => InitializeForeignKeyMetadata(database, task.Result));
                 }
                 _masterDataService.GetAllTablesForGivenDatabase(database).ContinueWith(task => BindTables(task.Result, database),
@@ -160,8 +156,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
@@ -188,16 +183,15 @@ namespace EasyViewer.ViewModel
             try
             {
                 _masterDataService.GetAllDatabases()
-                    .ContinueWith(task => BindDatabase(task.Result), TaskScheduler.FromCurrentSynchronizationContext());
+                    .ContinueWith(t => BindDatabase(t.Result, t.Exception), TaskScheduler.FromCurrentSynchronizationContext());
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
-        private void BindDatabase(IEnumerable<string> items)
+        private void BindDatabase(IEnumerable<string> items, AggregateException exception)
         {
             try
             {
@@ -208,8 +202,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
@@ -217,13 +210,13 @@ namespace EasyViewer.ViewModel
         {
             try
             {
+                ExceptionErrorMessage = string.Empty;
                 var data = _dataService.FetchQueryData(ChosenDb, ChosenTable, query);
                 AddQueryData(data);
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             } 
         }
 
@@ -257,8 +250,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
             
         }
@@ -279,8 +271,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
            
         }
@@ -306,8 +297,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
@@ -324,8 +314,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;    
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
@@ -351,8 +340,7 @@ namespace EasyViewer.ViewModel
             }
             catch (Exception ex)
             {
-                ExceptionErrorMessage = ex.StackTrace;
-                ShowExpander = true;
+                ExceptionErrorMessage = ex.ToString();
             }
         }
     }

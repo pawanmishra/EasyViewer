@@ -31,5 +31,10 @@ namespace EasyViewer.Model
             return await _dataService.ExecuteQuery(databaseName,
                 "SELECT Table_schema + '.'+ TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'");
         }
+
+        public async Task<List<Dto.ForeignKeyMetaData>> GetKeyMetaData(string dataBase)
+        {
+            return await _dataService.GetKeyMetaData(dataBase);
+        }
     }
 }

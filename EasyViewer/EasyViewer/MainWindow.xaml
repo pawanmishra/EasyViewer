@@ -37,6 +37,7 @@
                 <Setter Property="BorderThickness" Value="2"></Setter>
             </Style>
             <converter:SqlInstanceInfoConverter x:Key="SqlInstanceConverter"></converter:SqlInstanceInfoConverter>
+            <converter:IsGreaterThanOrEqualToConverter x:Key="IsGreaterThanOrEqualToConverter"></converter:IsGreaterThanOrEqualToConverter>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -127,18 +128,31 @@
             </Grid>
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Grid.Row="1">
-                <Expander IsExpanded= "{Binding ShowExpander, Mode=OneWay}" Name="ExceptionExpander" >
-                    <Border  BorderThickness="2">
-                        <TextBox  Height="Auto"  IsReadOnly="True"
-                                x:Name="TextBlock1"
-                            ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                            ScrollViewer.CanContentScroll="True"
-                              Text="{Binding Path=ExceptionErrorMessage, Mode=OneWay}">
-                        </TextBox>
-                    </Border>
+            <StackPanel>
+                <Expander Header="Message Board" Name="ExceptionExpander" >
+                    <TextBox  
+                        Height="Auto"  
+                        IsReadOnly="True"
+                        x:Name="TxtMessageBoard"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                        ScrollViewer.CanContentScroll="True"
+                        Text="{Binding Path=ExceptionErrorMessage, Mode=OneWay}">
+                    </TextBox>
+                    <Expander.Style>
+                        <Style>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=TxtMessageBoard, Path=Text}" Value="">
+                                    <Setter Property="Expander.Visibility" Value="Hidden"></Setter>
+                                    <Setter Property="Expander.IsExpanded" Value="False"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=TxtMessageBoard, Path=Text.Length, 
+                                    Converter={StaticResource IsGreaterThanOrEqualToConverter}, ConverterParameter=0}" Value="True">
+                                    <Setter Property="Expander.IsExpanded" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Expander.Style>
                 </Expander>
-
                 <ItemsControl x:Name="itemControl" ItemsSource="{Binding DataItems}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
