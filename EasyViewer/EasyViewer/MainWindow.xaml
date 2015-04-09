@@ -11,8 +11,7 @@
         xmlns:converter="clr-namespace:EasyViewer.Converter"
         xmlns:pwd="clr-namespace:EasyViewer.Helper"
         mc:Ignorable="d ignore"
-        Height="{x:Static SystemParameters.PrimaryScreenHeight}" 
-        Width="{x:Static SystemParameters.PrimaryScreenWidth}"
+        WindowState="Maximized"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     

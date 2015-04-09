@@ -52,7 +52,7 @@ namespace EasyViewer.Model
                         foreach (ForeignKeyColumn data in f.Columns)
                         {
                             lst.Add(new ForeignKeyMetaData(data.Name, table.Name, table.Schema,
-                                f.ReferencedTable, data.ReferencedColumn, f.ReferencedTableSchema));
+                                f.ReferencedTable, data.ReferencedColumn, f.ReferencedTableSchema, table.Columns[data.Name].DataType.Name));
                         }
                     }
                 }
@@ -70,7 +70,8 @@ namespace EasyViewer.Model
     sch1.name AS [schema_name],
     tab2.name AS [referenced_table],
     col2.name AS [referenced_column],
-    sch2.name as [ref_schema_name]
+    sch2.name as [ref_schema_name],
+    schmecols.DATA_TYPE as type
 FROM sys.foreign_key_columns fkc
 INNER JOIN sys.tables tab1
     ON tab1.object_id = fkc.parent_object_id
@@ -83,7 +84,9 @@ INNER JOIN sys.tables tab2
 INNER JOIN sys.schemas sch2
     ON tab2.schema_id = sch2.schema_id
 INNER JOIN sys.columns col2
-    ON col2.column_id = referenced_column_id AND col2.object_id = tab2.object_id";
+    ON col2.column_id = referenced_column_id AND col2.object_id = tab2.object_id
+inner join INFORMATION_SCHEMA.COLUMNS schmecols
+    on schmecols.COLUMN_NAME = col1.name and schmecols.TABLE_NAME = tab1.name";
 
             string connectionString = _connectionInfoService.GetConnectionString(dataBase);
 
@@ -101,7 +104,8 @@ INNER JOIN sys.columns col2
                             reader.GetFieldValue<string>(2),
                             reader.GetFieldValue<string>(3), 
                             reader.GetFieldValue<string>(4), 
-                            reader.GetFieldValue<string>(5)));
+                            reader.GetFieldValue<string>(5),
+                            reader.GetFieldValue<string>(6)));
                     }
                     return lst;
                 }
