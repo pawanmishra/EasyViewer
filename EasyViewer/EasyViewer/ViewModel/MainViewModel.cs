@@ -93,7 +93,13 @@ namespace EasyViewer.ViewModel
             }
         }
         public string RemoteInstancePassword { get; set; }
-        public bool ShowExpander { get; set; }
+
+        private bool _showExpander;
+        public bool ShowExpander
+        {
+            get { return _showExpander; }
+            set { Set(() => ShowExpander, ref _showExpander, value); }
+        }
 
         private string _query;
         public string Query

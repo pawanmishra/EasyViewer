@@ -129,12 +129,11 @@
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Grid.Row="1">
-                <Expander IsExpanded= "{Binding ShowExpander, Mode=TwoWay}" Name="ExceptionExpander" >
-                    <Border BorderBrush="Blue" BorderThickness="2">
+                <Expander IsExpanded= "{Binding ShowExpander, Mode=OneWay}" Name="ExceptionExpander" >
+                    <Border  BorderThickness="2">
                         <TextBox  Height="Auto"  IsReadOnly="True"
                                 x:Name="TextBlock1"
                             ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                            ScrollViewer.VerticalScrollBarVisibility="Visible"
                             ScrollViewer.CanContentScroll="True"
                               Text="{Binding Path=ExceptionErrorMessage, Mode=OneWay}">
                         </TextBox>
