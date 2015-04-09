@@ -32,7 +32,7 @@ namespace EasyViewer.Model
                 if (data != null)
                 {
                     var returnedData = _dataService.FetchQueryData(database, data.ReferencedTable,
-                        string.Format(QueryFormat, data.ReferencedTable, data.ReferencedColumn, columnValue));
+                        data.GetTargetSqlQuery(columnValue));
                     return returnedData;
                 }
             }
