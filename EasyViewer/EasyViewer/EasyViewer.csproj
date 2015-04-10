@@ -92,6 +92,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\IsGreaterThanOrEqualToConverter.cs" />
     <Compile Include="Converter\SqlInstanceInfoConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Dto\ContextMenuItemCommandArgs.cs" />
