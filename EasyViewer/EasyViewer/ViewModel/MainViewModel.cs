@@ -60,13 +60,6 @@ namespace EasyViewer.ViewModel
             Tables = new ObservableCollection<string>();
         }
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
-
-        ////    base.Cleanup();
-        ////}
-
         private string _chosenDb;
         public String ChosenDb
         {
@@ -79,6 +72,13 @@ namespace EasyViewer.ViewModel
                     FetchDataTablesQuery(value);
                 }
             }
+        }
+
+        private string _exceptionErrorMessage;
+        public String ExceptionErrorMessage
+        {
+            get { return _exceptionErrorMessage; }
+            set { Set(() => ExceptionErrorMessage, ref  _exceptionErrorMessage, value); }
         }
 
         private string _chosenTable;
@@ -101,17 +101,28 @@ namespace EasyViewer.ViewModel
             set { Set(() => Query, ref _query, value); }
         }
 
+        /// <summary>
+        /// Initialize Sql Server connection instance i.e. local or remote instance
+        /// </summary>
         private void ConnectToSqlInstance(SqlInstanceConnectionInfo connectionInfo)
         {
-            connectionInfo.Password = RemoteInstancePassword;
-            _connectionInfoService.InitializeConnectionString(connectionInfo);
-            ResetApp();
-            FetchDatabasesQuery();
+            try
+            {
+                connectionInfo.Password = RemoteInstancePassword;
+                _connectionInfoService.InitializeConnectionString(connectionInfo);
+                ResetApp();
+                FetchDatabasesQuery();
+            }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
+            }
         }
 
         private void ResetApp()
         {
             Counter = 0;
+            ExceptionErrorMessage = string.Empty;
             DataItems.Clear();
             Tables.Clear();
             DataBases.Clear();
@@ -123,23 +134,30 @@ namespace EasyViewer.ViewModel
         /// <param name="database">database name for which list of tables have to be retrieved</param>
         public void FetchDataTablesQuery(string database)
         {
-            Tables.Clear();
-            if (DataTablesDictionary.ContainsKey(database))
+            try
             {
-                foreach (var item in DataTablesDictionary[database])
+                Tables.Clear();
+                if (DataTablesDictionary.ContainsKey(database))
                 {
-                    Tables.Add(item);
+                    foreach (var item in DataTablesDictionary[database])
+                    {
+                        Tables.Add(item);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            if (!_metaData.ContainsKey(database))
-            {
-                _dataService.GetKeyMetaData(database)
-                    .ContinueWith(task => InitializeForeignKeyMetadata(database, task.Result));
+                if (!_metaData.ContainsKey(database))
+                {
+                    _masterDataService.GetKeyMetaData(database)
+                        .ContinueWith(task => InitializeForeignKeyMetadata(database, task.Result));
+                }
+                _masterDataService.GetAllTablesForGivenDatabase(database).ContinueWith(task => BindTables(task.Result, database),
+                        TaskScheduler.FromCurrentSynchronizationContext());
             }
-            _masterDataService.GetAllTablesForGivenDatabase(database).ContinueWith(task => BindTables(task.Result, database),
-                    TaskScheduler.FromCurrentSynchronizationContext());
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
+            }
         }
 
         private void InitializeForeignKeyMetadata(string database, List<ForeignKeyMetaData> list)
@@ -165,26 +183,41 @@ namespace EasyViewer.ViewModel
             try
             {
                 _masterDataService.GetAllDatabases()
-                    .ContinueWith(task => BindDatabase(task.Result), TaskScheduler.FromCurrentSynchronizationContext());
+                    .ContinueWith(t => BindDatabase(t.Result, t.Exception), TaskScheduler.FromCurrentSynchronizationContext());
             }
             catch (Exception ex)
             {
-                // ToDo handle exceptions
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
-        private void BindDatabase(IEnumerable<string> items)
+        private void BindDatabase(IEnumerable<string> items, AggregateException exception)
         {
-            foreach(var item in items)
+            try
             {
-                DataBases.Add(item);
+                foreach (var item in items)
+                {
+                    DataBases.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
         private void ExecuteDbQuery(string query)
         {
-            var data = _dataService.FetchQueryData(ChosenDb, ChosenTable, query);
-            AddQueryData(data);
+            try
+            {
+                ExceptionErrorMessage = string.Empty;
+                var data = _dataService.FetchQueryData(ChosenDb, ChosenTable, query);
+                AddQueryData(data);
+            }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
+            } 
         }
 
         /// <summary>
@@ -192,26 +225,34 @@ namespace EasyViewer.ViewModel
         /// </summary>
         private void AutoGenerateColumnHandler(DataGridAutoGenerateCommandArgs e)
         {
-            ForeignKeyMetaData data = null;
-            List<ForeignKeyMetaData> metaData;
-            if (_metaData.ContainsKey(ChosenDb))
+            try
             {
-                metaData = _metaData[ChosenDb];
-            }
-            else
-            {
-                metaData = _dataService.GetForeignKeyMetaData(ChosenDb);
-                _metaData.Add(ChosenDb, metaData);
-            }
+                ForeignKeyMetaData data = null;
+                List<ForeignKeyMetaData> metaData;
+                if (_metaData.ContainsKey(ChosenDb))
+                {
+                    metaData = _metaData[ChosenDb];
+                }
+                else
+                {
+                    metaData = _dataService.GetForeignKeyMetaData(ChosenDb);
+                    _metaData.Add(ChosenDb, metaData);
+                }
 
-            data = metaData.FirstOrDefault(x => x.CurrentColumn ==
-                    e.ColumnEventArgs.PropertyName && x.CurrentTable.Equals(e.Grid.Tag.ToString()));
+                data = metaData.FirstOrDefault(x => x.CurrentColumn ==
+                        e.ColumnEventArgs.PropertyName && x.CurrentTable.Equals(e.Grid.Tag.ToString()));
 
-            if (data != null)
-            {
-                Style customStyle = (Style)e.Grid.FindResource("customStyle");
-                e.ColumnEventArgs.Column.CellStyle = customStyle;
+                if (data != null)
+                {
+                    Style customStyle = (Style)e.Grid.FindResource("customStyle");
+                    e.ColumnEventArgs.Column.CellStyle = customStyle;
+                }
             }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
+            }
+            
         }
 
         /// <summary>
@@ -219,12 +260,20 @@ namespace EasyViewer.ViewModel
         /// </summary>
         private void DataGridDoubleClickHandler(DataGridDoubleClickCommandArgs args)
         {
-            var frameworkMetaData = _metaData[ChosenDb];
-            var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData, ChosenDb);
-            if (returnedData != null)
-            {   
-                AddQueryData(returnedData);
+            try
+            {
+                var frameworkMetaData = _metaData[ChosenDb];
+                var returnedData = _viewerService.ProcessGridDoubleClick(args, frameworkMetaData, ChosenDb);
+                if (returnedData != null)
+                {
+                    AddQueryData(returnedData);
+                }
             }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
+            }
+           
         }
 
         /// <summary>
@@ -233,15 +282,22 @@ namespace EasyViewer.ViewModel
         /// <param name="args"></param>
         private void ContextMenuHandler(ContextMenuItemCommandArgs args)
         {
-            var contextMenu = (ContextMenu)args.MenuItem.Parent;
-            var item = (DataGrid)contextMenu.PlacementTarget;
-            var tableName = item.Tag.ToString();
-            var selectedIndex = item.SelectedIndex;
-            QueryData queryData = DataItems.FirstOrDefault(x => x.TableName.Equals(tableName));
-
-            if (queryData != null)
+            try
             {
-                queryData.QueryDataTable.Rows.RemoveAt(selectedIndex);
+                var contextMenu = (ContextMenu)args.MenuItem.Parent;
+                var item = (DataGrid)contextMenu.PlacementTarget;
+                var tableName = item.Tag.ToString();
+                var selectedIndex = item.SelectedIndex;
+                QueryData queryData = DataItems.FirstOrDefault(x => x.TableName.Equals(tableName));
+
+                if (queryData != null)
+                {
+                    queryData.QueryDataTable.Rows.RemoveAt(selectedIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
             }
         }
 
@@ -251,26 +307,40 @@ namespace EasyViewer.ViewModel
         /// <param name="counter"></param>
         private void RemoveTableFromGrid(int counter)
         {
-            var item = DataItems.First(x => x.Counter == counter);
-            DataItems.Remove(item);
+            try
+            {
+                var item = DataItems.First(x => x.Counter == counter);
+                DataItems.Remove(item);
+            }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
+            }
         }
 
         private void AddQueryData(QueryData data)
         {
-            var items = DataItems.ToList();
-            var index = items.FindIndex(x => x.TableName.Equals(data.TableName));
-            if (index < 0)
+            try
             {
-                data.Counter = Counter++;
-                DataItems.Add(data);
-            }
-            else
-            {
-                var querydata = DataItems[index];
-                foreach (DataRow row in data.QueryDataTable.Rows)
+                var items = DataItems.ToList();
+                var index = items.FindIndex(x => x.TableName.Equals(data.TableName));
+                if (index < 0)
                 {
-                    querydata.QueryDataTable.ImportRow(row);
+                    data.Counter = Counter++;
+                    DataItems.Add(data);
                 }
+                else
+                {
+                    var querydata = DataItems[index];
+                    foreach (DataRow row in data.QueryDataTable.Rows)
+                    {
+                        querydata.QueryDataTable.ImportRow(row);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionErrorMessage = ex.ToString();
             }
         }
     }
