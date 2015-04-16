@@ -29,7 +29,7 @@ namespace EasyViewer.Model
         public async Task<List<string>> GetAllTablesForGivenDatabase(string databaseName)
         {
             return await _dataService.ExecuteQuery(databaseName,
-                "SELECT Table_schema + '.'+ TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'");
+                "SELECT Table_schema + '.'+ TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' order by TABLE_SCHEMA,TABLE_NAME");
         }
     }
 }
