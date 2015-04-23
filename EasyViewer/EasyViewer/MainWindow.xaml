@@ -41,6 +41,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
+    <ScrollViewer>
     <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"></RowDefinition>
@@ -198,4 +199,5 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
+    </ScrollViewer>
 </Window>
